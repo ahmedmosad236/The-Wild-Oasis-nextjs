@@ -1,17 +1,24 @@
-import React from "react";
-import CabinCard from "../_components/CabinCard";
+import React, { Suspense } from "react";
+import CabinCard from "../_components/ProductCard";
+import axios from "axios";
+import ProductCard from "../_components/ProductCard";
+import ProductList from "../_components/ProductList";
+import Spinner from "../_components/Spinner";
 export const metadata = {
-  title: "Cabins",
+  title: "Products",
 };
 
-export default function Page() {
+export default async function Page() {
   // CHANGE
-  const cabins = [];
+  // const res = await axios.get("https://fakestoreapi.com/products");
+  // console.log(res.data);
+
+  // const products = res.data;
 
   return (
     <div>
       <h1 className="text-4xl mb-5 text-accent-400 font-medium">
-        Our Luxury Cabins
+        Our Luxury Products
       </h1>
       <p className="text-primary-200 text-lg mb-10">
         Cozy yet luxurious cabins, located right in the heart of the Italian
@@ -22,13 +29,9 @@ export default function Page() {
         Welcome to paradise.
       </p>
 
-      {cabins.length > 0 && (
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 xl:gap-14">
-          {cabins.map((cabin) => (
-            <CabinCard cabin={cabin} key={cabin.id} />
-          ))}
-        </div>
-      )}
+      <Suspense fallback={<Spinner />}>
+        <ProductList />
+      </Suspense>
     </div>
   );
 }

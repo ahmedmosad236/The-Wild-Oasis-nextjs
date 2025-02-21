@@ -1,4 +1,4 @@
-import CabinCard from "@/app/_components/CabinCard";
+import CabinCard from "@/app/_components/ProductCard";
 
 export default function Page() {
   // CHANGE
