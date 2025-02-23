@@ -1,45 +1,70 @@
 import { EyeSlashIcon, MapPinIcon, UsersIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
+import { notFound } from "next/navigation";
+
+async function fetchProduct(productId) {
+  try {
+    const res = await fetch(`https://fakestoreapi.com/products/${productId}`);
+    if (!res.ok) throw new Error("Failed to fetch product data");
+    return await res.json();
+  } catch (error) {
+    notFound();
+  }
+}
 
 export async function generateMetadata({ params }) {
-  try {
-    const res = await fetch(
-      `https://fakestoreapi.com/products/${params.productid}`
-    );
-    if (!res.ok) throw new Error("Failed to fetch product data");
+  const product = await fetchProduct(params.productid);
+  return { title: product ? `Product: ${product.title}` : "Product Not Found" };
+}
+// export async function generateStaticParams() {
+//   const products = await fetchProduct();
+//   console.log(products);
 
-    const product = await res.json();
-    return { title: `Product: ${product.title}` };
+//   const ids = products.map((product) => ({
+//     productid: String(product.id),
+//   }));
+//   console.log(ids);
+
+//   return ids;
+// }
+export async function generateStaticParams() {
+  try {
+    const res = await fetch("https://fakestoreapi.com/products");
+    if (!res.ok) throw new Error("Failed to fetch products");
+    const products = await res.json();
+
+    console.log("Products:", products);
+
+    const ids = products.map((product) => ({
+      productid: String(product.id),
+    }));
+
+    console.log("Generated IDs:", ids);
+
+    return ids;
   } catch (error) {
-    console.error("Metadata fetch error:", error);
-    return { title: "Product Not Found" };
+    console.error("Error in generateStaticParams:", error);
+    return [];
   }
 }
 export default async function Page({ params }) {
-  // Fetch product data (Replacing cabin data)
-  const res = await fetch(
-    `https://fakestoreapi.com/products/${params.productid}`
-  );
-  const product = await res.json();
-  console.log(params);
+  const product = await fetchProduct(params.productid);
 
-  // Destructure the product properties
-  const { id, title, price, description, image, category, rating } = product;
+  if (!product) return null;
+
+  const { title, price, description, image, category, rating } = product;
 
   return (
     <div className="max-w-6xl mx-auto mt-8">
       <div className="grid grid-cols-[3fr_4fr] gap-20 border border-primary-800 py-3 px-10 mb-24">
-        {/* Product Image */}
         <div className="relative scale-[1.15] -translate-x-3">
           <Image width={300} height={300} src={image} alt={title} />
         </div>
 
-        {/* Product Details */}
         <div>
-          <h3 className="text-accent-100 font-black text-7xl mb-5 translate-x-[-254px] bg-primary-950 p-6 pb-1 w-[150%]">
+          <h3 className="text-accent-100 font-black text-7xl mb-5 bg-primary-950 p-6 pb-1 w-[150%] -translate-x-[254px]">
             {title}
           </h3>
-
           <p className="text-lg text-primary-300 mb-10">{description}</p>
 
           <ul className="flex flex-col gap-4 mb-7">
@@ -64,7 +89,6 @@ export default async function Page({ params }) {
             </li>
           </ul>
 
-          {/* Price */}
           <p className="text-4xl font-semibold">
             ${price}{" "}
             <span className="text-primary-400 text-lg">/ per item</span>
@@ -72,7 +96,6 @@ export default async function Page({ params }) {
         </div>
       </div>
 
-      {/* Call to Action */}
       <div>
         <h2 className="text-5xl font-semibold text-center">
           Order now. Fast delivery available.
