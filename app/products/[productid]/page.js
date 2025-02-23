@@ -1,6 +1,20 @@
 import { EyeSlashIcon, MapPinIcon, UsersIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 
+export async function generateMetadata({ params }) {
+  try {
+    const res = await fetch(
+      `https://fakestoreapi.com/products/${params.productid}`
+    );
+    if (!res.ok) throw new Error("Failed to fetch product data");
+
+    const product = await res.json();
+    return { title: `Product: ${product.title}` };
+  } catch (error) {
+    console.error("Metadata fetch error:", error);
+    return { title: "Product Not Found" };
+  }
+}
 export default async function Page({ params }) {
   // Fetch product data (Replacing cabin data)
   const res = await fetch(
