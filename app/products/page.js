@@ -8,10 +8,12 @@ export const metadata = {
   title: "Products",
 };
 
-export default async function Page() {
+export default async function Page({ searchParams }) {
   // CHANGE
   // const res = await axios.get("https://fakestoreapi.com/products");
   // console.log(res.data);
+  console.log(searchParams);
+  const filter = searchParams?.rating ?? "all";
 
   // const products = res.data;
 
@@ -30,7 +32,7 @@ export default async function Page() {
       </p>
 
       <Suspense fallback={<Spinner />}>
-        <ProductList />
+        <ProductList filter={filter} />
       </Suspense>
     </div>
   );
